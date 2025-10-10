@@ -3,20 +3,20 @@ version: "3.8"
 services:
   mysql:
     image: mysql:8.0
-    container_name: modelproject-mysql
+    container_name: modelproject2-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: modelproject
       MYSQL_USER: user
       MYSQL_PASSWORD: my-secret-pw
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
   app:
-    image: model-project-app
-    container_name: modelproject-app
+    image: model-project1
+    container_name: modelproject2-app
     depends_on:
       - mysql
     ports:
