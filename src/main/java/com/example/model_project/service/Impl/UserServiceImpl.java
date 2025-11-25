@@ -20,15 +20,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser register(RegisterDto dto) {
+
         if (userRepo.existsByUsername(dto.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
+
+        if (userRepo.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         AppUser user = new AppUser();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        String role = dto.getRole() == null || dto.getRole().isBlank() ? "ROLE_USER" : ("ROLE_" + dto.getRole().toUpperCase());
-        user.setRole(role);
+
         return userRepo.save(user);
     }
 

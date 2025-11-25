@@ -20,7 +20,5 @@ public class AppUser {
 
     private String password;
 
-    private String role="ROLE_USER";
-
     private String email;
 }

@@ -25,4 +25,7 @@ public interface TransactionService {
     List<TransactionDto> findByDate(LocalDate date);
 
     double getAvailableQuantity();
+
+    List<TransactionDto> search(String type, String location, LocalDate date);
+
 }

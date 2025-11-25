@@ -114,4 +114,18 @@ public class TransactionServiceImpl implements TransactionService {
 
         return totalBought - totalSold;
     }
+
+    @Override
+    public List<TransactionDto> search(String type, String location, LocalDate date) {
+
+        return transactionRepo.findAll()
+                .stream()
+                .filter(t -> (type == null || type.isEmpty() || t.getType().equalsIgnoreCase(type)))
+                .filter(t -> (location == null || location.isEmpty() ||
+                        t.getLocation().equalsIgnoreCase(location)))
+                .filter(t -> (date == null || t.getDate().equals(date)))
+                .map(t -> modelMapper.map(t, TransactionDto.class))
+                .toList();
+    }
+
 }

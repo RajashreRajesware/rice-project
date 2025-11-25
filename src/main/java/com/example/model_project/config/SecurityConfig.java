@@ -25,15 +25,18 @@ public class SecurityConfig {
     public SecurityConfig(UserRepo userRepo){
         this.userRepo=userRepo;
     }
+
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepo.findByUsername(username)
-                .map(user -> User.withUsername(user.getUsername())
+        return email -> userRepo.findByEmail(email)
+                .map(user -> User.withUsername(user.getEmail())
                         .password(user.getPassword())
-                        .roles(user.getRole().replace("ROLE_", ""))
+                        .roles("USER")
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -57,17 +60,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Must explicitly permit /login and /error
                         .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")  // changed endpoint for POST
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
                         .defaultSuccessUrl("/home", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")

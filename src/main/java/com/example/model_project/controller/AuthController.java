@@ -40,16 +40,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute("user") RegisterDto dto, Model model) {
+
         if (userRepo.findByUsername(dto.getUsername()).isPresent()) {
             model.addAttribute("error", "Username already exists!");
-            return "register"; // show same page with message
+            return "register";
         }
 
-        if (dto.getRole() == null || dto.getRole().isBlank())
-            dto.setRole("USER");
+        if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            model.addAttribute("error", "Email already exists!");
+            return "register";
+        }
 
         userService.register(dto);
         return "redirect:/login?success";
-
     }
+
 }

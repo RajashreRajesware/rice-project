@@ -3,7 +3,6 @@ package com.example.model_project.controller;
 import com.example.model_project.dto.TransactionDto;
 import com.example.model_project.service.TransactionService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -27,25 +25,10 @@ public class TransactionController {
         List<TransactionDto> list = transactionService.getAll();
         double availableQuantity = transactionService.getAvailableQuantity();
 
-
         model.addAttribute("users", list);
         model.addAttribute("availableQuantity", availableQuantity);
 
         return "view";
-
-
-    }
-
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        model.addAttribute("user", new TransactionDto());
-        return "view";
-    }
-
-    @PostMapping("/create")
-    public String create(@ModelAttribute("user") TransactionDto dto) {
-        transactionService.save(dto);
-        return "redirect:/allUsers";
     }
 
     @GetMapping("/add")
@@ -54,10 +37,15 @@ public class TransactionController {
         return "add";
     }
 
+    @PostMapping("/create")
+    public String create(@ModelAttribute("user") TransactionDto dto) {
+        transactionService.save(dto);
+        return "redirect:/allUsers";
+    }
+
     @GetMapping("/edit/{id}")
     public String showEdit(@PathVariable Long id, Model model) {
-        TransactionDto dto = transactionService.findById(id);
-        model.addAttribute("user", dto);
+        model.addAttribute("user", transactionService.findById(id));
         return "edit";
     }
 
@@ -69,46 +57,65 @@ public class TransactionController {
 
     @GetMapping("/delete")
     public String showDeletePage() {
-
         return "delete";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteById(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteById(@PathVariable Long id, RedirectAttributes ra) {
         transactionService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Transaction deleted successfully!");
+        ra.addFlashAttribute("message", "Deleted successfully!");
         return "redirect:/allUsers";
     }
 
     @PostMapping("/delete/specific")
-    public String deleteSpecific(@RequestParam("id") Long id,
-                                 @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                 RedirectAttributes redirectAttributes) {
-        boolean deleted = transactionService.deleteByIdAndDate(id, date);
-        if (deleted) {
-            redirectAttributes.addFlashAttribute("message", "Transaction deleted successfully!");
+    public String deleteSpecific(
+            @RequestParam("id") Long id,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes ra) {
+
+        if (transactionService.deleteByIdAndDate(id, date)) {
+            ra.addFlashAttribute("message", "Transaction deleted successfully!");
         } else {
-            redirectAttributes.addFlashAttribute("error", "Transaction not found or date mismatch!");
+            ra.addFlashAttribute("error", "Transaction not found or date mismatch!");
         }
+
         return "redirect:/allUsers";
     }
 
     @PostMapping("/delete/search")
-    public String searchByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                               Model model) {
-        List<TransactionDto> transactions = transactionService.findByDate(date);
-        model.addAttribute("transactions", transactions);
+    public String searchByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model) {
+
+        model.addAttribute("transactions", transactionService.findByDate(date));
         model.addAttribute("selectedDate", date);
+
         return "deleteByDate";
     }
-    @GetMapping("/search")
-    public String searchByType(@RequestParam(name = "type", required = false) String type, Model model) {
-        List<TransactionDto> users = transactionService.findByType(type);
-        double availableQuantity = transactionService.getAvailableQuantity(); // add this
 
+    @GetMapping("/search")
+    public String search(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model) {
+
+        boolean filtersApplied =
+                (type != null && !type.isBlank()) ||
+                        (location != null && !location.isBlank()) ||
+                        date != null;
+
+        List<TransactionDto> users = filtersApplied
+                ? transactionService.search(type, location, date)
+                : List.of();
+
+        model.addAttribute("filtersApplied", filtersApplied);
         model.addAttribute("users", users);
         model.addAttribute("type", type);
-        model.addAttribute("availableQuantity",availableQuantity);
+        model.addAttribute("location", location);
+        model.addAttribute("date", date);
+
         return "search";
     }
 }
