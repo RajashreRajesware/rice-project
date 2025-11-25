@@ -10,7 +10,7 @@
 <div class="container mt-5">
     <h2 class="text-center text-danger mb-4">Delete Transactions by Date</h2>
 
-    <!-- Search Form -->
+  
     <form th:action="@{/delete/search}" method="post" class="text-center mb-4">
         <div class="mb-3 w-50 mx-auto">
             <input type="date" name="date" class="form-control" required th:value="${selectedDate}">
@@ -19,13 +19,13 @@
         <a th:href="@{/allUsers}" class="btn btn-secondary">Cancel</a>
     </form>
 
-    <!-- Display Table Only If Search Result Present -->
+ 
     <div th:if="${transactions != null}">
         <h5 class="text-center mb-3 text-primary">
             Transactions on <span th:text="${selectedDate}"></span>
         </h5>
 
-        <!-- Delete Form -->
+      
         <form th:action="@{/delete/multiple}" method="post" class="text-center">
 
             <table class="table table-bordered text-center">
