@@ -56,7 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         existing.setName(dto.getName());
         existing.setType(dto.getType());
-//        existing.setDate(dto.getDate());
+
         existing.setPrice(dto.getPrice());
         existing.setQuantity(dto.getQuantity());
         existing.setLocation(dto.getLocation());
