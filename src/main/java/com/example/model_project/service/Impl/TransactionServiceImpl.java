@@ -25,10 +25,29 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto save(TransactionDto dto) {
+
+        dto.setDate(LocalDate.now());
+
+        if (dto.getType().equalsIgnoreCase("Sold")) {
+
+            double available = getAvailableQuantity();
+
+            if (available <= 0) {
+                throw new IllegalStateException("No stock available. You cannot sell.");
+            }
+
+            if (dto.getQuantity() > available) {
+                throw new IllegalArgumentException(
+                        "You cannot sell more than available stock. Available: " + available
+                );
+            }
+        }
+
         Transaction tx = modelMapper.map(dto, Transaction.class);
         Transaction saved = transactionRepo.save(tx);
         return modelMapper.map(saved, TransactionDto.class);
     }
+
 
     @Override
     public TransactionDto update(Long id, TransactionDto dto) {
@@ -37,7 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         existing.setName(dto.getName());
         existing.setType(dto.getType());
-        existing.setDate(dto.getDate());
+//        existing.setDate(dto.getDate());
         existing.setPrice(dto.getPrice());
         existing.setQuantity(dto.getQuantity());
         existing.setLocation(dto.getLocation());
@@ -108,7 +127,6 @@ public class TransactionServiceImpl implements TransactionService {
         Double bought = transactionRepo.getTotalQuantityByType("Bought");
         Double sold = transactionRepo.getTotalQuantityByType("Sold");
 
-        // Handle nulls (when no Bought or Sold records exist yet)
         double totalBought = bought != null ? bought : 0.0;
         double totalSold = sold != null ? sold : 0.0;
 
@@ -127,5 +145,16 @@ public class TransactionServiceImpl implements TransactionService {
                 .map(t -> modelMapper.map(t, TransactionDto.class))
                 .toList();
     }
+
+    public int deleteMultipleByDate(List<Long> ids, LocalDate date) {
+        int count = 0;
+        for (Long id : ids) {
+            if (deleteByIdAndDate(id, date)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 
 }

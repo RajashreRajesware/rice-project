@@ -38,10 +38,21 @@ public class TransactionController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute("user") TransactionDto dto) {
-        transactionService.save(dto);
-        return "redirect:/allUsers";
+    public String create(@ModelAttribute("user") TransactionDto dto, Model model) {
+
+        try {
+            transactionService.save(dto);
+            return "redirect:/allUsers";
+        }
+        catch (IllegalStateException | IllegalArgumentException ex) {
+
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("user", dto);
+
+            return "failedPage";
+        }
     }
+
 
     @GetMapping("/edit/{id}")
     public String showEdit(@PathVariable Long id, Model model) {
@@ -67,20 +78,24 @@ public class TransactionController {
         return "redirect:/allUsers";
     }
 
-    @PostMapping("/delete/specific")
-    public String deleteSpecific(
-            @RequestParam("id") Long id,
+    @PostMapping("/delete/multiple")
+    public String deleteMultiple(
+            @RequestParam("ids") List<Long> ids,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             RedirectAttributes ra) {
 
-        if (transactionService.deleteByIdAndDate(id, date)) {
-            ra.addFlashAttribute("message", "Transaction deleted successfully!");
-        } else {
-            ra.addFlashAttribute("error", "Transaction not found or date mismatch!");
+        if (ids == null || ids.isEmpty()) {
+            ra.addFlashAttribute("error", "No records selected to delete!");
+            return "redirect:/allUsers";
         }
+
+        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
+
+        ra.addFlashAttribute("message", deletedCount + " record(s) deleted successfully!");
 
         return "redirect:/allUsers";
     }
+
 
     @PostMapping("/delete/search")
     public String searchByDate(

@@ -103,7 +103,6 @@
 <div class="container">
     <h2>Delete User by Date</h2>
 
-    <!-- Search Section with proper spacing -->
     <form th:action="@{/delete/search}" method="post">
         <div class="search-section">
             <input type="date" name="date" required th:value="${selectedDate}">
@@ -112,7 +111,6 @@
         </div>
     </form>
 
-    <!-- Show results -->
     <div th:if="${transactions != null}">
         <form th:action="@{/delete/selected}" method="post">
 

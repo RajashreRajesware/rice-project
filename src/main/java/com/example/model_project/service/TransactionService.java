@@ -28,4 +28,6 @@ public interface TransactionService {
 
     List<TransactionDto> search(String type, String location, LocalDate date);
 
+    int deleteMultipleByDate(List<Long> ids, LocalDate date);
+
 }

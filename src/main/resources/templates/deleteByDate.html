@@ -8,8 +8,9 @@
 <body class="bg-light">
 
 <div class="container mt-5">
-    <h2 class="text-center text-danger mb-4">Delete Specific Transaction by Date</h2>
+    <h2 class="text-center text-danger mb-4">Delete Transactions by Date</h2>
 
+    <!-- Search Form -->
     <form th:action="@{/delete/search}" method="post" class="text-center mb-4">
         <div class="mb-3 w-50 mx-auto">
             <input type="date" name="date" class="form-control" required th:value="${selectedDate}">
@@ -18,10 +19,15 @@
         <a th:href="@{/allUsers}" class="btn btn-secondary">Cancel</a>
     </form>
 
+    <!-- Display Table Only If Search Result Present -->
     <div th:if="${transactions != null}">
-        <h5 class="text-center mb-3 text-primary">Transactions on <span th:text="${selectedDate}"></span></h5>
+        <h5 class="text-center mb-3 text-primary">
+            Transactions on <span th:text="${selectedDate}"></span>
+        </h5>
 
-        <form th:action="@{/delete/specific}" method="post" class="text-center">
+        <!-- Delete Form -->
+        <form th:action="@{/delete/multiple}" method="post" class="text-center">
+
             <table class="table table-bordered text-center">
                 <thead class="table-danger">
                 <tr>
@@ -35,9 +41,13 @@
                     <th>Location</th>
                 </tr>
                 </thead>
+
                 <tbody>
                 <tr th:each="t : ${transactions}">
-                    <td><input type="radio" name="id" th:value="${t.id}" required></td>
+                    <td>
+                        <!-- Checkbox for Multiple Delete -->
+                        <input type="checkbox" name="ids" th:value="${t.id}">
+                    </td>
                     <td th:text="${t.id}"></td>
                     <td th:text="${t.name}"></td>
                     <td th:text="${t.type}"></td>
@@ -50,7 +60,7 @@
             </table>
 
             <input type="hidden" name="date" th:value="${selectedDate}">
-            <button type="submit" class="btn btn-danger mt-3">Delete Selected Record</button>
+            <button type="submit" class="btn btn-danger mt-3">Delete Selected Records</button>
         </form>
     </div>
 </div>
