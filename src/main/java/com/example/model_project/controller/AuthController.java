@@ -32,7 +32,7 @@ public class AuthController {
         return "login";
     }
 
-    @GetMapping("/register")
+    @GetMapping({"/", "/register"})
     public String showRegister(Model model) {
         model.addAttribute("user", new RegisterDto());
         return "register";
