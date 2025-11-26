@@ -104,14 +104,15 @@ public String deleteSelected(
 
     if (ids == null || ids.isEmpty()) {
         ra.addFlashAttribute("error", "No transactions selected to delete!");
-        return "redirect:/delete";
+        return "redirect:/delete/search?date=" + date;
     }
 
     int deletedCount = transactionService.deleteMultipleByDate(ids, date);
     ra.addFlashAttribute("message", deletedCount + " transaction(s) deleted!");
 
-    return "redirect:/delete";
+    return "redirect:/delete/search?date=" + date;
 }
+
 
 
 
