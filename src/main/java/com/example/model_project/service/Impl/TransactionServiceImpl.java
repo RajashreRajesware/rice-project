@@ -89,10 +89,23 @@ public class TransactionServiceImpl implements TransactionService {
                 .toList();
     }
 
-    @Override
-    public void deleteById(Long id) {
-        transactionRepo.deleteById(id);
+   public void deleteById(Long id) {
+    TransactionDto dto = findById(id);
+
+     if (dto.getType().equalsIgnoreCase("Bought")) {
+
+        double available = getAvailableQuantity();
+
+        if(dto.getQuantity() > available) {
+            throw new IllegalStateException(
+                "Cannot delete! This stock is already sold."
+            );
+        }
     }
+
+    repository.deleteById(id);
+}
+
 
     @Override
     public boolean deleteByIdAndDate(Long id, LocalDate date) {
@@ -129,8 +142,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         double totalBought = bought != null ? bought : 0.0;
         double totalSold = sold != null ? sold : 0.0;
+        double available = totalBought - totalSold;
 
-        return totalBought - totalSold;
+    return Math.max(available, 0.0);
     }
 
     @Override
