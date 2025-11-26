@@ -89,22 +89,22 @@ public class TransactionServiceImpl implements TransactionService {
                 .toList();
     }
 
-   public void deleteById(Long id) {
+ @Override
+public void deleteById(Long id) {
     TransactionDto dto = findById(id);
 
-     if (dto.getType().equalsIgnoreCase("Bought")) {
+    if (dto.getType().equalsIgnoreCase("Bought")) {
 
         double available = getAvailableQuantity();
 
-        if(dto.getQuantity() > available) {
-            throw new IllegalStateException(
-                "Cannot delete! This stock is already sold."
-            );
+        if (dto.getQuantity() > available) {
+            throw new IllegalStateException("Cannot delete! This stock is already sold.");
         }
     }
 
-    repository.deleteById(id);
+    transactionRepo.deleteById(id);
 }
+
 
 
     @Override
