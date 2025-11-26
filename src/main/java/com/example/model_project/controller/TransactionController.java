@@ -88,6 +88,18 @@ public class TransactionController {
 
         return "deleteByDate";
     }
+@GetMapping("/delete/search")
+public String showDeleteResults(
+        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        Model model,
+        @ModelAttribute("error") String error,
+        @ModelAttribute("message") String message) {
+
+    model.addAttribute("transactions", transactionService.findByDate(date));
+    model.addAttribute("selectedDate", date);
+
+    return "deleteByDate";
+}
 
  
 @PostMapping("/delete/selected")
@@ -112,8 +124,6 @@ public String deleteSelected(
 
     return "redirect:/delete/search?date=" + date;
 }
-
-
 
 
     @GetMapping("/search")
