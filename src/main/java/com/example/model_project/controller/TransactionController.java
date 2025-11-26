@@ -65,75 +65,77 @@ public class TransactionController {
         return "redirect:/allUsers";
     }
 
+
+
     @GetMapping("/delete")
     public String showDeletePage() {
         return "delete";
     }
 
-   @GetMapping("/delete/{id}")
-public String deleteById(@PathVariable Long id, RedirectAttributes ra) {
-    try {
-        transactionService.deleteById(id);
-        ra.addFlashAttribute("message", "Deleted successfully!");
-    } catch (Exception ex) {
-        ra.addFlashAttribute("error", ex.getMessage());
-    }
-    return "redirect:/allUsers";
-}
-
-
-  
-   @PostMapping("/delete/search")
-public String searchByDate(
-        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-        RedirectAttributes ra) {
-
-    ra.addFlashAttribute("selectedDate", date);
-    return "redirect:/delete/search?date=" + date;
-}
-
-    
-@GetMapping("/delete/search")
-public String showDeleteResults(
-        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-        Model model,
-        @ModelAttribute(value = "error") String error,
-        @ModelAttribute(value = "message") String message) {
-
-    model.addAttribute("transactions", transactionService.findByDate(date));
-    model.addAttribute("selectedDate", date);
-
-    return "deleteByDate";
-}
-
-
- 
-@PostMapping("/delete/selected")
-public String deleteSelected(
-        @RequestParam(required = false) List<Long> ids,
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-        RedirectAttributes ra) {
-
-    if (date == null) {
-        ra.addFlashAttribute("error", "Please select a date!");
-        return "redirect:/delete";
+    @GetMapping("/delete/{id}")
+    public String deleteById(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            transactionService.deleteById(id);
+            ra.addFlashAttribute("message", "Deleted successfully!");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/allUsers";
     }
 
-    if (ids == null || ids.isEmpty()) {
-        ra.addFlashAttribute("error", "Select at least one transaction!");
+
+
+    @PostMapping("/delete/search")
+    public String searchByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes ra) {
+
+        ra.addFlashAttribute("selectedDate", date);
         return "redirect:/delete/search?date=" + date;
     }
 
-    try {
-        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
-        ra.addFlashAttribute("message", deletedCount + " record(s) deleted.");
-    } catch (Exception e) {
-        ra.addFlashAttribute("error", e.getMessage());
+
+    @GetMapping("/delete/search")
+    public String showDeleteResults(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model,
+            @ModelAttribute(value = "error") String error,
+            @ModelAttribute(value = "message") String message) {
+
+        model.addAttribute("transactions", transactionService.findByDate(date));
+        model.addAttribute("selectedDate", date);
+
+        return "deleteByDate";
     }
 
-    return "redirect:/delete/search?date=" + date;
-}
+
+
+    @PostMapping("/delete/selected")
+    public String deleteSelected(
+            @RequestParam(required = false) List<Long> ids,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes ra) {
+
+        if (date == null) {
+            ra.addFlashAttribute("error", "Please select a date!");
+            return "redirect:/delete";
+        }
+
+        if (ids == null || ids.isEmpty()) {
+            ra.addFlashAttribute("error", "Select at least one transaction!");
+            return "redirect:/delete/search?date=" + date;
+        }
+
+        try {
+            int deletedCount = transactionService.deleteMultipleByDate(ids, date);
+            ra.addFlashAttribute("message", deletedCount + " record deleted.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/delete/search?date=" + date;
+    }
 
     @GetMapping("/search")
     public String search(
