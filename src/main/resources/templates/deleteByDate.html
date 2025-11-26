@@ -55,10 +55,9 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
-        button, a.btn {
+        button {
             padding: 10px 20px;
             border-radius: 6px;
-            text-decoration: none;
             font-weight: bold;
             cursor: pointer;
             border: none;
@@ -90,7 +89,9 @@
             background-color: #ffb4b4;
             font-weight: bold;
         }
-        .text-center { text-align: center; }
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -107,7 +108,11 @@
         <div class="search-section">
             <input type="date" name="date" required th:value="${selectedDate}">
             <button type="submit" class="btn-primary">Search</button>
-            <a th:href="@{/allUsers}" class="btn-secondary btn">Cancel</a>
+
+            <!-- Converted to a real button -->
+            <button type="button" class="btn-secondary" onclick="window.location.href='/allUsers'">
+                Cancel
+            </button>
         </div>
     </form>
 
@@ -148,6 +153,7 @@
             <div class="text-center" style="margin-top:20px;">
                 <button type="submit" class="btn-danger">Delete Selected Records</button>
             </div>
+
         </form>
     </div>
 
