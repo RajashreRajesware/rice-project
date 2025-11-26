@@ -23,48 +23,50 @@ public class TransactionServiceImpl implements TransactionService {
         this.modelMapper = modelMapper;
     }
 
-    @Override
-    public TransactionDto save(TransactionDto dto) {
+   @Override
+public TransactionDto save(TransactionDto dto) {
 
-        dto.setDate(LocalDate.now());
+    dto.setDate(LocalDate.now());
 
-        if (dto.getType().equalsIgnoreCase("Sold")) {
+    if (dto.getType().equalsIgnoreCase("Sold")) {
+        double available = getAvailableQuantity();
 
-            double available = getAvailableQuantity();
-
-            if (available <= 0) {
-                throw new IllegalStateException("No stock available. You cannot sell.");
-            }
-
-            if (dto.getQuantity() > available) {
-                throw new IllegalArgumentException(
-                        "You cannot sell more than available stock. Available: " + available
-                );
-            }
+        if (available <= 0) {
+            throw new IllegalStateException("No stock available. You cannot sell.");
         }
 
-        Transaction tx = modelMapper.map(dto, Transaction.class);
-        Transaction saved = transactionRepo.save(tx);
-        return modelMapper.map(saved, TransactionDto.class);
+        if (dto.getQuantity() > available) {
+            throw new IllegalArgumentException(
+                    "You cannot sell more than available stock. Available: " + available
+            );
+        }
     }
 
+    Transaction tx = modelMapper.map(dto, Transaction.class);
+    Transaction saved = transactionRepo.save(tx);
+    return modelMapper.map(saved, TransactionDto.class);
+}
+    
+  @Override
+public TransactionDto update(Long id, TransactionDto dto) {
+    Transaction existing = transactionRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Transaction not found: " + id));
 
-    @Override
-    public TransactionDto update(Long id, TransactionDto dto) {
-        Transaction existing = transactionRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found: " + id));
+    double previousQty = existing.getQuantity();
+    double available = getAvailableQuantity();
 
-        existing.setName(dto.getName());
-        existing.setType(dto.getType());
-
-        existing.setPrice(dto.getPrice());
-        existing.setQuantity(dto.getQuantity());
-        existing.setLocation(dto.getLocation());
-
-        Transaction updated = transactionRepo.save(existing);
-        return modelMapper.map(updated, TransactionDto.class);
+    if (existing.getType().equalsIgnoreCase("Sold") && dto.getQuantity() > previousQty + available) {
+        throw new IllegalArgumentException(
+                "Cannot increase sold quantity more than available stock!"
+        );
     }
 
+    modelMapper.map(dto, existing);
+    Transaction updated = transactionRepo.save(existing);
+    return modelMapper.map(updated, TransactionDto.class);
+}
+
+    
     @Override
     public List<TransactionDto> getAll() {
         return transactionRepo.findAll().stream()
@@ -89,23 +91,24 @@ public class TransactionServiceImpl implements TransactionService {
                 .toList();
     }
 
- @Override
+@Override
 public void deleteById(Long id) {
-    TransactionDto dto = findById(id);
+    Transaction transaction = transactionRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Transaction not found: " + id));
 
-    if (dto.getType().equalsIgnoreCase("Bought")) {
+    double qty = transaction.getQuantity();
+    double available = getAvailableQuantity();
 
-        double available = getAvailableQuantity();
+    if (transaction.getType().equalsIgnoreCase("Bought")) {
 
-        if (dto.getQuantity() > available) {
+        if (available - qty < 0) {
             throw new IllegalStateException("Cannot delete! This stock is already sold.");
         }
     }
 
     transactionRepo.deleteById(id);
 }
-
-
+    
 
     @Override
     public boolean deleteByIdAndDate(Long id, LocalDate date) {
