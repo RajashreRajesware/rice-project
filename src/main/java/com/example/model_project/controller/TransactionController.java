@@ -108,6 +108,24 @@ public class TransactionController {
         return "deleteByDate";
     }
 
+    @PostMapping("/delete/selected")
+    public String deleteSelected(
+            @RequestParam(required = false) List<Long> ids,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes ra) {
+
+        if (ids == null || ids.isEmpty()) {
+            ra.addFlashAttribute("error", "No transactions selected to delete!");
+            return "redirect:/delete";
+        }
+
+        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
+        ra.addFlashAttribute("message", deletedCount + " transaction(s) deleted!");
+
+        return "redirect:/delete";
+    }
+
+
     @GetMapping("/search")
     public String search(
             @RequestParam(required = false) String type,
