@@ -70,36 +70,42 @@ public class TransactionController {
         return "delete";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteById(@PathVariable Long id, RedirectAttributes ra) {
+   @GetMapping("/delete/{id}")
+public String deleteById(@PathVariable Long id, RedirectAttributes ra) {
+    try {
         transactionService.deleteById(id);
         ra.addFlashAttribute("message", "Deleted successfully!");
-        return "redirect:/allUsers";
+    } catch (Exception ex) {
+        ra.addFlashAttribute("error", ex.getMessage());
     }
+    return "redirect:/allUsers";
+}
+
 
   
-    @PostMapping("/delete/search")
-    public String searchByDate(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            Model model) {
+   @PostMapping("/delete/search")
+public String searchByDate(
+        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        RedirectAttributes ra) {
 
-        model.addAttribute("transactions", transactionService.findByDate(date));
-        model.addAttribute("selectedDate", date);
+    ra.addFlashAttribute("selectedDate", date);
+    return "redirect:/delete/search?date=" + date;
+}
 
-        return "deleteByDate";
-    }
+    
 @GetMapping("/delete/search")
 public String showDeleteResults(
         @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
         Model model,
-        @ModelAttribute("error") String error,
-        @ModelAttribute("message") String message) {
+        @ModelAttribute(value = "error") String error,
+        @ModelAttribute(value = "message") String message) {
 
     model.addAttribute("transactions", transactionService.findByDate(date));
     model.addAttribute("selectedDate", date);
 
     return "deleteByDate";
 }
+
 
  
 @PostMapping("/delete/selected")
@@ -110,21 +116,24 @@ public String deleteSelected(
         RedirectAttributes ra) {
 
     if (date == null) {
-        ra.addFlashAttribute("error", "No date selected for delete!");
+        ra.addFlashAttribute("error", "Please select a date!");
         return "redirect:/delete";
     }
 
     if (ids == null || ids.isEmpty()) {
-        ra.addFlashAttribute("error", "No transactions selected to delete!");
+        ra.addFlashAttribute("error", "Select at least one transaction!");
         return "redirect:/delete/search?date=" + date;
     }
 
-    int deletedCount = transactionService.deleteMultipleByDate(ids, date);
-    ra.addFlashAttribute("message", deletedCount + " transaction(s) deleted!");
+    try {
+        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
+        ra.addFlashAttribute("message", deletedCount + " record(s) deleted.");
+    } catch (Exception e) {
+        ra.addFlashAttribute("error", e.getMessage());
+    }
 
     return "redirect:/delete/search?date=" + date;
 }
-
 
     @GetMapping("/search")
     public String search(
