@@ -63,10 +63,18 @@
             cursor: pointer;
             border: none;
         }
-        .btn-primary { background-color: #0275d8; color: white; }
-        .btn-secondary { background-color: gray; color: white; }
-        .btn-danger { background-color: #d9534f; color: white; }
-
+        .btn-primary { 
+            background-color: #0275d8;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: gray;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #d9534f;
+            color: white;
+        }
         table {
             width: 100%;
             margin-top: 20px;
@@ -104,9 +112,6 @@
     </form>
 
     <div th:if="${transactions != null}">
-        <h4 class="text-center" style="color:#0275d8; margin-bottom:15px;">
-            Transactions on <span th:text="${selectedDate}"></span>
-        </h4>
 
         <form th:action="@{/delete/selected}" method="post">
 
