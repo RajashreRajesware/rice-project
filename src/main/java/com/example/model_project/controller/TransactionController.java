@@ -53,7 +53,6 @@ public class TransactionController {
         }
     }
 
-
     @GetMapping("/edit/{id}")
     public String showEdit(@PathVariable Long id, Model model) {
         model.addAttribute("user", transactionService.findById(id));
@@ -78,25 +77,7 @@ public class TransactionController {
         return "redirect:/allUsers";
     }
 
-    @PostMapping("/delete/multiple")
-    public String deleteMultiple(
-            @RequestParam("ids") List<Long> ids,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            RedirectAttributes ra) {
-
-        if (ids == null || ids.isEmpty()) {
-            ra.addFlashAttribute("error", "No records selected to delete!");
-            return "redirect:/allUsers";
-        }
-
-        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
-
-        ra.addFlashAttribute("message", deletedCount + " record(s) deleted successfully!");
-
-        return "redirect:/allUsers";
-    }
-
-
+  
     @PostMapping("/delete/search")
     public String searchByDate(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -108,22 +89,30 @@ public class TransactionController {
         return "deleteByDate";
     }
 
-    @PostMapping("/delete/selected")
-    public String deleteSelected(
-            @RequestParam(required = false) List<Long> ids,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            RedirectAttributes ra) {
+ 
+@PostMapping("/delete/selected")
+public String deleteSelected(
+        @RequestParam(required = false) List<Long> ids,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        RedirectAttributes ra) {
 
-        if (ids == null || ids.isEmpty()) {
-            ra.addFlashAttribute("error", "No transactions selected to delete!");
-            return "redirect:/delete";
-        }
-
-        int deletedCount = transactionService.deleteMultipleByDate(ids, date);
-        ra.addFlashAttribute("message", deletedCount + " transaction(s) deleted!");
-
+    if (date == null) {
+        ra.addFlashAttribute("error", "No date selected for delete!");
         return "redirect:/delete";
     }
+
+    if (ids == null || ids.isEmpty()) {
+        ra.addFlashAttribute("error", "No transactions selected to delete!");
+        return "redirect:/delete";
+    }
+
+    int deletedCount = transactionService.deleteMultipleByDate(ids, date);
+    ra.addFlashAttribute("message", deletedCount + " transaction(s) deleted!");
+
+    return "redirect:/delete";
+}
+
 
 
     @GetMapping("/search")
