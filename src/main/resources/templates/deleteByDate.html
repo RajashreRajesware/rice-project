@@ -101,8 +101,15 @@
 
     <h2>Delete Transactions by Date</h2>
 
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+<div th:if="${error != null and error != ''}" 
+     class="alert alert-danger" 
+     th:text="${error}">
+</div>
+
+    <div th:if="${message != null and message != ''}" 
+     class="alert alert-success" 
+     th:text="${message}">
+</div>
 
     <form th:action="@{/delete/search}" method="post">
         <div class="search-section">
