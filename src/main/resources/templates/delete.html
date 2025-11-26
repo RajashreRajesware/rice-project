@@ -28,11 +28,31 @@
             font-weight: bold;
         }
 
+        .alert {
+            padding: 12px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+
+        .alert-success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+
         .search-section {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px; /* spacing between input and buttons */
+            gap: 15px;
             margin-bottom: 25px;
         }
 
@@ -53,20 +73,9 @@
             font-weight: bold;
         }
 
-        .btn-primary {
-            background-color: #0275d8;
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: gray;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #d9534f;
-            color: white;
-        }
+        .btn-primary { background-color: #0275d8; color: white; }
+        .btn-secondary { background-color: gray; color: white; }
+        .btn-danger { background-color: #d9534f; color: white; }
 
         table {
             width: 100%;
@@ -74,9 +83,7 @@
             margin-top: 25px;
         }
 
-        table, th, td {
-            border: 1px solid #bbb;
-        }
+        table, th, td { border: 1px solid #bbb; }
 
         th {
             background-color: #f2b8b5;
@@ -88,13 +95,8 @@
             text-align: center;
         }
 
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-3 {
-            margin-top: 20px;
-        }
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 20px; }
     </style>
 </head>
 
@@ -102,6 +104,10 @@
 
 <div class="container">
     <h2>Delete User by Date</h2>
+
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
 
     <form th:action="@{/delete/search}" method="post">
         <div class="search-section">
@@ -113,6 +119,8 @@
 
     <div th:if="${transactions != null}">
         <form th:action="@{/delete/selected}" method="post">
+
+            <input type="hidden" name="date" th:value="${selectedDate}">
 
             <table>
                 <thead>
