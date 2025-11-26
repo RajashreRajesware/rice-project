@@ -10,6 +10,10 @@
 <div class="container mt-5">
     <h2 class="text-center text-danger mb-4">Delete Transactions by Date</h2>
 
+    <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success text-center" th:text="${message}"></div>
+
+
   
     <form th:action="@{/delete/search}" method="post" class="text-center mb-4">
         <div class="mb-3 w-50 mx-auto">
