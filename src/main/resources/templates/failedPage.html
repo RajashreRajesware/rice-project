@@ -49,7 +49,8 @@
 <div class="error-box">
     <h2 class="error-title">Transaction Failed</h2>
 
-    <p class="text-muted">Stock is unavailable. You cannot proceed with this transaction.</p>
+    <!-- <p class="text-muted">Stock is unavailable. You cannot proceed with this transaction.</p> -->
+<p class="text-danger fw-bold" th:text="${error}"></p>
 
     <div class="mt-4">
         <a th:href="@{/home}" class="btn btn-secondary btn-custom">Back to Home</a>
