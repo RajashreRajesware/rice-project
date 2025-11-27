@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setFullName(request.getFullName()); 
+        user.setFullName(dto.getFullName()); 
 
         return userRepo.save(user);
     }
