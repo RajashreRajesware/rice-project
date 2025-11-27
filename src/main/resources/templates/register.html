@@ -53,6 +53,10 @@
 
         <h2 class="text-center mb-4">Register</h2>
 
+          <div th:if="${error}" class="alert alert-danger text-center fw-bold">
+            <span th:text="${error}"></span>
+        </div>
+
         <form th:action="@{/register}" th:object="${user}" method="post">
 
             <div class="mb-3">
