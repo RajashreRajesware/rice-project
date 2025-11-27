@@ -19,6 +19,10 @@ public class AppUser {
     private String username;
 
     private String password;
+    
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
 
     private String email;
 }
