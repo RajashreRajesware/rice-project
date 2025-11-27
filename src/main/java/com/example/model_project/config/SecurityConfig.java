@@ -22,10 +22,11 @@ public class SecurityConfig {
 
     private final UserRepo userRepo;
 
-    public SecurityConfig(UserRepo userRepo){
-        this.userRepo=userRepo;
+    public SecurityConfig(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
+    // Load user using email
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepo.findByEmail(email)
@@ -33,9 +34,9 @@ public class SecurityConfig {
                         .password(user.getPassword())
                         .roles("USER")
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + email));
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,7 +48,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
+    // Allow semicolon in URLs (optional)
     @Bean
     public HttpFirewall allowSemicolonHttpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
@@ -57,22 +58,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/register", "/login", "/error",
+                                "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
+                        .usernameParameter("email")      // login using email
+                        .passwordParameter("password")   // from your login form
                         .defaultSuccessUrl("/home", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
@@ -81,5 +83,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
