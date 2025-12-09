@@ -30,4 +30,13 @@ public interface TransactionService {
 
     int deleteMultipleByDate(List<Long> ids, LocalDate date);
 
+    int deleteByDateRange(LocalDate startDate, LocalDate endDate);
+
+
+    int deleteMultiple(List<Long> ids);
+
+
+    List<TransactionDto> findByDateRange(LocalDate startDate, LocalDate endDate);
+
+
 }
