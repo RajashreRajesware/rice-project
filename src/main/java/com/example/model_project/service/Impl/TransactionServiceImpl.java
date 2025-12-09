@@ -76,6 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
         return modelMapper.map(updated, TransactionDto.class);
     }
 
+
     @Override
     public List<TransactionDto> getAll() {
         return transactionRepo.findAll().stream()
@@ -188,6 +189,52 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return count;
     }
+
+    @Override
+    public int deleteByDateRange(LocalDate startDate, LocalDate endDate) {
+
+        List<Transaction> transactions = transactionRepo.findAll().stream()
+                .filter(t -> !t.getDate().isBefore(startDate) && !t.getDate().isAfter(endDate))
+                .toList();
+
+        if (transactions.isEmpty()) {
+            return 0; // tell controller no records found
+        }
+
+        for (Transaction t : transactions) {
+            if (t.getType().equalsIgnoreCase("Bought")) {
+                double availableAfterDelete = getAvailableQuantity() - t.getQuantity();
+                if (availableAfterDelete < 0) {
+                    throw new IllegalStateException(
+                            "Cannot delete! Purchase record dated " + t.getDate() + " is required to support existing sales."
+                    );
+                }
+            }
+        }
+
+        transactions.forEach(tx -> transactionRepo.deleteById(tx.getId()));
+        return transactions.size();
+    }
+
+    @Override
+    public int deleteMultiple(List<Long> ids) {
+        int count = ids.size();
+        transactionRepo.deleteAllById(ids);
+        return count;
+    }
+
+    @Override
+    public List<TransactionDto> findByDateRange(LocalDate startDate, LocalDate endDate) {
+
+        List<Transaction> list = transactionRepo.findAll().stream()
+                .filter(t -> !t.getDate().isBefore(startDate) && !t.getDate().isAfter(endDate))
+                .toList();
+
+        return list.stream()
+                .map(t -> modelMapper.map(t, TransactionDto.class))
+                .toList();
+    }
+
 
 
 }
